@@ -1,20 +1,40 @@
-node {
+pipeline {
 
-stage ('SCM') {
-//git clone
-git 'https://github.com/balakrishnavepuri/spring-petclinic.git'
+  agent { label 'master' }
 
-}
+  options {
 
-stage ('build the packages') {
-// build the code
-sh label: '', script: 'mvn package'
+    disableConcurrentBuilds()
+    timeout(time: 10, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '10'))
 
-}
-stage ('Archcaving the artifacts') {
-// artifacts
-archiveArtifacts 'target/*.jar'
+  } 
 
-}
 
-}
+ stages {
+        stage('Build') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+// Stagging_Environment
+stage('Delpoy for stagging') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                script {
+            //enable remote triggers
+          properties([pipelineTriggers([pollSCM('* * * * *')])])
+          // copying jar file to Stagging Server
+          sh 'scp jenkins@3.236.162.51:/var/lib/jenkins/workspace/givecharity/target/*.jar ubuntu@3.236.185.64:/home/ubuntu/opt/deployment/backend'
+        // excuting jar command 
+          sh 'ubuntu@3.236.185.64 "nohup java -jar /home/ubuntu/opt/deployment/backend/*.jar &"'
+        } // script
+      } // steps
+    } // stage
+     
+  
+ } // Stagging
+
+ } // pipeline
