@@ -20,7 +20,7 @@ pipeline {
 // Stagging_Environment
 stage('Delpoy for stagging') {
             when {
-                branch 'develop'
+                branch 'master'
             }
             steps {
                 script {
