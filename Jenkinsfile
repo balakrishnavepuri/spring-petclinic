@@ -29,7 +29,7 @@ stage('Approval') {
                 script {
                     emailext mimeType: 'text/html',
                  subject: "[Jenkins]${currentBuild.fullDisplayName}",
-                 to: "balakrishnavepuri@.com",
+                 to: "balakrishnavepuri@gmail.com",
                  body: '''<a href="${BUILD_URL}input">click to approve</a>'''
 
         def userInput = input id: 'userInput',
@@ -37,8 +37,8 @@ stage('Approval') {
                               submitterParameter: 'submitter',
                               submitter: 'balakrishna',
                               parameters: [
-                                [$class: 'TextParameterDefinition', defaultValue: 'sit', description: 'Environment', name: 'env'],
-                                [$class: 'TextParameterDefinition', defaultValue: 'k8s', description: 'Target', name: 'target']]
+                                [$class: 'TextParameterDefinition', defaultValue: 'stagging', description: 'Environment', name: 'env'],
+                                [$class: 'TextParameterDefinition', defaultValue: 'Stagging_Server', description: 'Target', name: 'target']]
 
         echo ("Env: "+userInput['env'])
         echo ("Target: "+userInput['target'])
@@ -67,5 +67,6 @@ stage('Delpoy for stagging') {
      
   
  } // Stagging
+
 
  } // pipeline
