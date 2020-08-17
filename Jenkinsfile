@@ -27,9 +27,9 @@ stage('Delpoy for stagging') {
             //enable remote triggers
           properties([pipelineTriggers([pollSCM('* * * * *')])])
           // copying jar file to Stagging Server
-          sh 'scp -r /var/lib/jenkins/workspace/givecharity_master/target/*.jar appuser@3.235.9.10:~/opt/deployment/backend'
+          sh 'scp -r ubuntu@3.235.161.70:~/var/lib/jenkins/workspace/givecharity_master/target/*.jar appuser@3.235.9.10:~/opt/deployment/backend'
         // excuting jar command 
-          sh 'ubuntu@107.23.23.98 "nohup java -jar /home/appuser/opt/deployment/backend/*.jar &"'
+          sh 'ubuntu@3.235.9.10 "nohup java -jar /home/appuser/opt/deployment/backend/*.jar &"'
         } // script
       } // steps
     } // stage
