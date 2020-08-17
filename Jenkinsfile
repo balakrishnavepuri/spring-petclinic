@@ -24,7 +24,7 @@ pipeline {
 
 stage('Approval') {
             // no agent, so executors are not used up when waiting for approvals
-            agent none
+            
             steps {
                 script {
                     emailext mimeType: 'text/html',
