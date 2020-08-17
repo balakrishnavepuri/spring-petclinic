@@ -27,13 +27,13 @@ stage('Approval') {
             
             steps {
                 script {
-                    emailext mimeType: 'text/html',
-                 subject: "[Jenkins]${currentBuild.fullDisplayName}",
-                 to: "balakrishnavepuri@gmail.com",
-                 body: '''<a href="${BUILD_URL}input">click to approve</a>'''
+                   // emailext mimeType: 'text/html',
+                 // subject: "[Jenkins]${currentBuild.fullDisplayName}",
+                 // to: "balakrishnavepuri@gmail.com",
+                 //body: '''<a href="${BUILD_URL}input">click to approve</a>'''
 
         def userInput = input id: 'userInput',
-                              message: 'Let\'s promote?', 
+                              message: 'Let\'s Deplooy to Stagging Environment?', 
                               submitterParameter: 'submitter',
                               submitter: 'balakrishna',
                               parameters: [
@@ -67,6 +67,5 @@ stage('Delpoy for stagging') {
      
   
  } // Stagging
-
 
  } // pipeline
