@@ -1,71 +1,40 @@
 pipeline {
-
-  agent { label 'master' }
-
-  options {
-
-    disableConcurrentBuilds()
-    timeout(time: 10, unit: 'MINUTES')
-    buildDiscarder(logRotator(numToKeepStr: '10'))
-
-  } 
-
-
- stages {
-        stage('Build') {
+    agent { label 'master'}
+    tools {
+        maven 'MAVEN' 
+    }
+    triggers {
+        cron('H * * * 1-5')
+    }
+    stages {
+        stage('scm') {
             steps {
-                sh 'mvn package'
+                git branch: 'master', url:'https://github.com/balakrishnavepuri/spring-petclinic.git'        
             }
         }
-
-
-
-
-
-stage('Approval') {
-            // no agent, so executors are not used up when waiting for approvals
-            
+        stage('build') {
             steps {
-                script {
-                   // emailext mimeType: 'text/html',
-                 // subject: "[Jenkins]${currentBuild.fullDisplayName}",
-                 // to: "balakrishnavepuri@gmail.com",
-                 //body: '''<a href="${BUILD_URL}input">click to approve</a>'''
+                withSonarQubeEnv('sonar-6.7.4') {
+                    sh script: 'mvn clean package sonar:sonar'
 
-        def userInput = input id: 'userInput',
-                              message: 'Let\'s Deplooy to Stagging Environment?', 
-                              submitterParameter: 'submitter',
-                              submitter: 'balakrishna',
-                              parameters: [
-                                [$class: 'TextParameterDefinition', defaultValue: 'stagging', description: 'Environment', name: 'env'],
-                                [$class: 'TextParameterDefinition', defaultValue: 'Stagging_Server', description: 'Target', name: 'target']]
-
-        echo ("Env: "+userInput['env'])
-        echo ("Target: "+userInput['target'])
-        echo ("submitted by: "+userInput['submitter'])
                 }
+                
             }
         }
-
-
-// Stagging_Environment
-stage('Delpoy for stagging') {
-            when {
-                branch 'master'
-            }
+        
+        stage('post build') {
             steps {
-                script {
-            //enable remote triggers
-          properties([pipelineTriggers([pollSCM('* * * * *')])])
-          // copying jar file to Stagging Server
-          sh 'scp -r /var/lib/jenkins/workspace/givecharity_master/target/*.jar ubuntu@34.201.48.214:/opt/deployment/backend'
-        // excuting jar command 3.237.195.201
-          sh 'ssh ubuntu@34.201.48.214 "nohup java -jar /opt/deployment/backend/*.jar &"'
-        } // script
-      } // steps
-    } // stage
-     
-  
- } // Stagging
-
- } // pipeline
+                junit 'gameoflife-web/target/surefire-reports/*.xml'
+                archiveArtifacts 'gameoflife-web/target/*.war'
+            }
+        }
+        stage("Quality Gate") {
+            steps {
+              timeout(time: 1, unit: 'HOURS') {
+                waitForQualityGate abortPipeline: true, credentialsId: 'SONAR_TOKEN'
+              }
+            }
+        }
+    }
+    
+}
