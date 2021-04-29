@@ -24,8 +24,8 @@ pipeline {
         
         stage('post build') {
             steps {
-                junit 'gameoflife-web/target/surefire-reports/*.xml'
-                archiveArtifacts 'gameoflife-web/target/*.war'
+                junit 'spring-petclinic/target/surefire-reports/*.xml'
+                archiveArtifacts 'spring-petclinic/target/*.jar'
             }
         }
         stage("Quality Gate") {
